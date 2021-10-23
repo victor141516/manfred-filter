@@ -1,64 +1,10 @@
 import fetch from 'node-fetch'
 import { DOMWindow, JSDOM } from 'jsdom'
 
-interface ApiJob {
-  salaryFrom: number
-  salaryTo: number
-  id: number
-  status: string
-  position: Record<string, string>
-  companyName: string
-}
-
-const JOB_BASE_URL = 'https://www.getmanfred.com/ofertas-empleo/'
-const ALL_SKILLS = [
-  '.NET',
-  'Android',
-  'Angular',
-  'AWS',
-  'C#',
-  'C++',
-  'Docker',
-  'Flutter',
-  'Go',
-  'GraphQL',
-  'iOS',
-  'Java',
-  'JavaScript',
-  'Jenkins',
-  'Kafka',
-  'Kubernetes',
-  'Laravel',
-  'Microsoft WPF',
-  'MongoDB',
-  'MySQL',
-  'Node',
-  'PHP',
-  'PostgreSQL',
-  'Python',
-  'React',
-  'Ruby',
-  'Ruby',
-  'SQL',
-  'Symfony',
-  'Terraform',
-  'Typescript',
-  'Vue',
-]
-
-const filter = {
-  minSalary: 40000,
-  preferredSkills: ['TypeScript', 'JavaScript', 'Node.js', 'Python', 'Vue'] as string[] | null,
-  unwantedSkills: ['Java', 'Ruby', 'Ruby on Rails'] as string[] | null,
-  // preferredSkills: null as string[] | null,
-  // unwantedSkills: null as string[] | null,
-}
-
-function xpath(window: DOMWindow, selector: string) {
-  const document = window.document
-  const matchingElement = document.evaluate(selector, document, null, 9, null).singleNodeValue
-  return matchingElement as HTMLElement | null
-}
+import { ApiJob } from './types'
+import { filter } from './filter'
+import { ALL_SKILLS, JOB_BASE_URL } from './constants'
+import { xpath } from 'html'
 
 function getSkills(window: DOMWindow) {
   const headerMatchers = {
@@ -106,7 +52,7 @@ function getSkills(window: DOMWindow) {
   return requirements
 }
 
-;(async () => {
+async function main() {
   const jobs = await fetch('https://www.getmanfred.com/ofertas-empleo')
     .then((r) => r.text())
     .then((h) => new JSDOM(h))
@@ -171,4 +117,6 @@ function getSkills(window: DOMWindow) {
   )
   // const skills = Array.from(new Set(filteredPages.map(({skills})=>skills.top1.concat(skills.top2).concat(skills.top3).map(({skill})=>skill)).flat()))
   // const ALL_SKILLS = ['Flutter', 'Android', 'iOS', 'SQL', 'C++', 'Go', 'AWS', 'MongoDB', 'Vue', 'JavaScript', 'Node', 'Python', 'Kafka', 'React', 'Ruby', 'Microsoft WPF', '.NET', 'C#', 'Angular', 'Ruby', 'PostgreSQL', 'GraphQL', 'PHP', 'MySQL', 'Laravel', 'Symfony', 'Java', 'Typescript', 'Terraform', 'Docker', 'Kubernetes', 'Jenkins']
-})()
+}
+
+main()
