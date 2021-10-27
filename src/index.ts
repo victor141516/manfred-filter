@@ -60,9 +60,8 @@ async function main() {
     .then((s) => JSON.parse(s))
     .then((j) => j.props.pageProps.data.offers as ApiJob[])
 
-  //TODO: Make everything async
-  const jobsWithPages = await Promise.all(
-    jobs.map(async (j) => {
+  jobs
+    .map(async (j) => {
       const html = await fetch(`${JOB_BASE_URL}${j.id}`).then((r) => r.text())
       const skills = getSkills(new JSDOM(html).window)
       return {
@@ -70,11 +69,11 @@ async function main() {
         html,
         skills,
       }
-    }),
-  )
+    })
+    .map(async (prom) => {
+      // act as filter
+      const { salaryFrom, status, skills } = await prom
 
-  const filteredPages = jobsWithPages
-    .filter(({ salaryFrom, status, skills }) => {
       const jobSkills = skills.top1.concat(skills.top2).map(({ skill }) => skill)
 
       const isActive = status === 'ACTIVE'
@@ -88,21 +87,20 @@ async function main() {
         jobSkills.map((e) => e.toLowerCase()).includes(s.toLowerCase()),
       )
 
-      if (!isActive) return false
-      else if (!salaryOk) return false
-      else if (hasPreferredSkill && hasUnwantedSkill) return containsPreferredSkill && !containsUnwantedSkill
-      else if (hasPreferredSkill) return containsPreferredSkill
-      else if (hasUnwantedSkill) return !containsUnwantedSkill
-      else return true
+      if (!isActive) return null
+      else if (!salaryOk) return null
+      else if (hasPreferredSkill && hasUnwantedSkill)
+        return containsPreferredSkill && !containsUnwantedSkill ? prom : null
+      else if (hasPreferredSkill) return containsPreferredSkill ? prom : null
+      else if (hasUnwantedSkill) return !containsUnwantedSkill ? prom : null
+      else return prom
     })
-    .map((f: Partial<typeof jobsWithPages[0]>) => {
-      delete f.html
-      return f as typeof jobsWithPages[0]
-    })
+    .forEach(async (prom) => {
+      if (!(await prom)) return
+      const { id, salaryFrom, salaryTo, companyName, position, skills } = (await prom)!
 
-  filteredPages.forEach(({ id, salaryFrom, salaryTo, companyName, position, skills }) =>
-    console.log(
-      `<-----------------------
+      console.log(
+        `<-----------------------
       ${Object.values(position)[0]} @ ${companyName}
       💸💸 ${salaryFrom / 1000}k - ${salaryTo / 1000}k
       Must: ${skills.top1.map(({ skill }) => skill).join(', ')}
@@ -114,8 +112,8 @@ async function main() {
 
       URL: ${JOB_BASE_URL}${id}
 ----------------------->`,
-    ),
-  )
+      )
+    })
   // const skills = Array.from(new Set(filteredPages.map(({skills})=>skills.top1.concat(skills.top2).concat(skills.top3).map(({skill})=>skill)).flat()))
   // const ALL_SKILLS = ['Flutter', 'Android', 'iOS', 'SQL', 'C++', 'Go', 'AWS', 'MongoDB', 'Vue', 'JavaScript', 'Node', 'Python', 'Kafka', 'React', 'Ruby', 'Microsoft WPF', '.NET', 'C#', 'Angular', 'Ruby', 'PostgreSQL', 'GraphQL', 'PHP', 'MySQL', 'Laravel', 'Symfony', 'Java', 'Typescript', 'Terraform', 'Docker', 'Kubernetes', 'Jenkins']
 }
