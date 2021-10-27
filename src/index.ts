@@ -4,7 +4,7 @@ import { DOMWindow, JSDOM } from 'jsdom'
 import { ApiJob } from './types'
 import { filter } from './filter'
 import { ALL_SKILLS, JOB_BASE_URL } from './constants'
-import { xpath } from 'html'
+import { xpath } from './html'
 
 function getSkills(window: DOMWindow) {
   const headerMatchers = {
@@ -13,7 +13,7 @@ function getSkills(window: DOMWindow) {
     top3: 'Da puntos extra',
   }
   const top4 = {
-    top4: Array.from(
+    top4: Array.from<HTMLElement>(
       xpath(window, "//h2[contains(text(),'Qué piden')]/parent::header/parent::div//li")?.querySelectorAll('strong') ??
         [],
     ).map((s) => ({ skill: s.textContent!.trim(), level: -1 })),
@@ -34,7 +34,7 @@ function getSkills(window: DOMWindow) {
       )!
       if (!header) return {}
       return {
-        [top]: Array.from(header.parentElement!.querySelectorAll('ul > li')).map((e) => ({
+        [top]: Array.from<HTMLElement>(header.parentElement!.querySelectorAll('ul > li')).map((e) => ({
           skill: e.querySelector('h5')!.textContent!,
           level: levelMatchers[e.querySelector('figcaption')!.textContent as keyof typeof levelMatchers],
         })),
@@ -60,6 +60,7 @@ async function main() {
     .then((s) => JSON.parse(s))
     .then((j) => j.props.pageProps.data.offers as ApiJob[])
 
+  //TODO: Make everything async
   const jobsWithPages = await Promise.all(
     jobs.map(async (j) => {
       const html = await fetch(`${JOB_BASE_URL}${j.id}`).then((r) => r.text())

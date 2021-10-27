@@ -2,11 +2,14 @@
   "name": "manfred-filter",
   "version": "1.0.0",
   "main": "dist/index.js",
+  "bin": "cli.sh",
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "start": "node --experimental-specifier-resolution=node --loader ts-node/esm src/index.ts",
     "build": "tsc",
+    "build:install-dependencies": "cp package.json package-lock.json src/cli.sh dist && (cd dist && npm install --only=production)",
+    "prepare-release": "npm run build && npm run build:install-dependencies",
     "run-compiled": "node --experimental-specifier-resolution=node",
     "lint": "eslint src/**",
     "lint:tsc": "tsc --noEmit"
@@ -22,12 +25,14 @@
   ],
   "dependencies": {
     "jsdom": "^17.0.0",
-    "node-fetch": "^3.0.0"
+    "node-fetch": "^3.0.0",
+    "yargs": "^17.2.1"
   },
   "devDependencies": {
     "@types/jsdom": "^16.2.13",
     "@types/node": "^16.7.13",
     "@types/node-fetch": "^3.0.2",
+    "@types/yargs": "^17.0.4",
     "@typescript-eslint/eslint-plugin": "^4.31.0",
     "@typescript-eslint/parser": "^4.31.0",
     "eslint": "^7.32.0",

@@ -6,11 +6,10 @@ RUN npm i
 COPY . /app
 RUN npm run build
 
-
 FROM node:lts-alpine
 
 WORKDIR /app
 COPY --from=builder /app/dist /app/package.json /app/package-lock.json /app/
 RUN npm install --only=production
 
-CMD ["npm", "run", "run-compiled", "index.js"]
+CMD ["npm", "run", "run-compiled", "--", "dist/index.js"]
