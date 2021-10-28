@@ -75,14 +75,22 @@ async function main() {
       const { salaryFrom, status, skills } = await prom
 
       const jobSkills = skills.top1.concat(skills.top2).map(({ skill }) => skill)
+      if (jobSkills.length === 0) {
+        jobSkills.push(
+          ...skills.top3
+            .concat(skills.top4)
+            .concat(skills.top5)
+            .map(({ skill }) => skill),
+        )
+      }
 
       const isActive = status === 'ACTIVE'
       const salaryOk = salaryFrom > filter.minSalary
-      const hasPreferredSkill = filter.preferredSkills !== null
+      const hasPreferredSkill = filter.preferredSkills !== undefined
       const containsPreferredSkill = filter.preferredSkills?.some((s) =>
         jobSkills.map((e) => e.toLowerCase()).includes(s.toLowerCase()),
       )
-      const hasUnwantedSkill = filter.unwantedSkills !== null
+      const hasUnwantedSkill = filter.unwantedSkills !== undefined
       const containsUnwantedSkill = filter.unwantedSkills?.some((s) =>
         jobSkills.map((e) => e.toLowerCase()).includes(s.toLowerCase()),
       )
@@ -96,6 +104,7 @@ async function main() {
       else return prom
     })
     .forEach(async (prom) => {
+      prom.catch((err) => console.error('Error:', err))
       if (!(await prom)) return
       const { id, salaryFrom, salaryTo, companyName, position, skills } = (await prom)!
 
@@ -114,7 +123,7 @@ async function main() {
 ----------------------->`,
       )
     })
-  // const skills = Array.from(new Set(filteredPages.map(({skills})=>skills.top1.concat(skills.top2).concat(skills.top3).map(({skill})=>skill)).flat()))
+  // const skills = Array.from(new Set(skills=>skills.top1.concat(skills.top2).concat(skills.top3).map(({skill})=>skill)).flat()))
   // const ALL_SKILLS = ['Flutter', 'Android', 'iOS', 'SQL', 'C++', 'Go', 'AWS', 'MongoDB', 'Vue', 'JavaScript', 'Node', 'Python', 'Kafka', 'React', 'Ruby', 'Microsoft WPF', '.NET', 'C#', 'Angular', 'Ruby', 'PostgreSQL', 'GraphQL', 'PHP', 'MySQL', 'Laravel', 'Symfony', 'Java', 'Typescript', 'Terraform', 'Docker', 'Kubernetes', 'Jenkins']
 }
 

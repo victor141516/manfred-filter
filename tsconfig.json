@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "baseUrl": "src",
     "sourceMap": true,
     "target": "es6",

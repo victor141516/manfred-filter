@@ -1,6 +1,6 @@
 {
   "name": "manfred-filter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "dist/index.js",
   "bin": "cli.sh",
   "license": "UNLICENSED",
@@ -10,6 +10,7 @@
     "build": "tsc",
     "build:install-dependencies": "cp package.json package-lock.json src/cli.sh dist && (cd dist && npm install --only=production)",
     "prepare-release": "npm run build && npm run build:install-dependencies",
+    "publish-module": "npm i && rm -rf dist && npm run prepare-release && (cd dist && npm publish)",
     "run-compiled": "node --experimental-specifier-resolution=node",
     "lint": "eslint src/**",
     "lint:tsc": "tsc --noEmit"

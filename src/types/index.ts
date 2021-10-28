@@ -9,6 +9,6 @@ export interface ApiJob {
 
 export interface Filter {
   minSalary: number
-  preferredSkills: string[] | null
-  unwantedSkills: string[] | null
+  preferredSkills: string[] | undefined
+  unwantedSkills: string[] | undefined
 }
