@@ -12,4 +12,4 @@ WORKDIR /app
 COPY --from=builder /app/dist /app/package.json /app/package-lock.json /app/
 RUN npm install --only=production
 
-CMD ["npm", "run", "run-compiled", "--", "dist/index.js"]
+ENTRYPOINT ["npm", "run", "run-compiled", "--", "index.js"]
