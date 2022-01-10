@@ -72,7 +72,7 @@ async function main() {
     })
     .map(async (prom) => {
       // act as filter
-      const { salaryFrom, status, skills } = await prom
+      const { salaryFrom, status, skills, slug } = await prom
 
       const jobSkills = skills.top1.concat(skills.top2).map(({ skill }) => skill)
       if (jobSkills.length === 0) {
@@ -119,7 +119,7 @@ async function main() {
       Bullets: ${skills.top4.map(({ skill }) => skill).join('; ')}
       Text: ${skills.top5.map(({ skill }) => skill).join(', ')}
 
-      URL: ${JOB_BASE_URL}${id}
+      URL: ${JOB_BASE_URL}${id}/${Object.values((await prom)!.slug)[0]}
 ----------------------->`,
       )
     })
