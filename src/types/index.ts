@@ -5,6 +5,7 @@ export interface ApiJob {
   status: string
   position: Record<string, string>
   companyName: string
+  slug: Record<string, string>
 }
 
 export interface Filter {

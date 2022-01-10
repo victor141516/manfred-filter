@@ -58,11 +58,11 @@ async function main() {
     .then((h) => new JSDOM(h))
     .then((jsdom) => jsdom.window.document.getElementById('__NEXT_DATA__')!.textContent!)
     .then((s) => JSON.parse(s))
-    .then((j) => j.props.pageProps.data.offers as ApiJob[])
-
+    .then((j) => j.props.pageProps.offers as ApiJob[])
+  
   jobs
     .map(async (j) => {
-      const html = await fetch(`${JOB_BASE_URL}${j.id}`).then((r) => r.text())
+      const html = await fetch(`${JOB_BASE_URL}${j.id}/${Object.values(j.slug)[0]}`).then((r) => r.text())
       const skills = getSkills(new JSDOM(html).window)
       return {
         ...j,
